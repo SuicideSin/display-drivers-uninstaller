@@ -34,7 +34,7 @@ Partial Class frmLaunch
         'btnClose
         '
         Me.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnClose.Location = New System.Drawing.Point(252, 235)
+        Me.btnClose.Location = New System.Drawing.Point(249, 223)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(93, 39)
         Me.btnClose.TabIndex = 0
@@ -43,8 +43,9 @@ Partial Class frmLaunch
         '
         'btnAccept
         '
+        Me.btnAccept.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnAccept.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.btnAccept.Location = New System.Drawing.Point(0, 235)
+        Me.btnAccept.Location = New System.Drawing.Point(12, 223)
         Me.btnAccept.Name = "btnAccept"
         Me.btnAccept.Size = New System.Drawing.Size(93, 39)
         Me.btnAccept.TabIndex = 1
@@ -71,7 +72,7 @@ Partial Class frmLaunch
         Me.pbLogo.InitialImage = Nothing
         Me.pbLogo.Location = New System.Drawing.Point(0, 0)
         Me.pbLogo.Name = "pbLogo"
-        Me.pbLogo.Size = New System.Drawing.Size(345, 121)
+        Me.pbLogo.Size = New System.Drawing.Size(354, 121)
         Me.pbLogo.TabIndex = 4
         Me.pbLogo.TabStop = False
         '
@@ -101,7 +102,7 @@ Partial Class frmLaunch
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
         Me.CancelButton = Me.btnClose
-        Me.ClientSize = New System.Drawing.Size(345, 274)
+        Me.ClientSize = New System.Drawing.Size(354, 274)
         Me.ControlBox = False
         Me.Controls.Add(Me.lblNotSafeMode)
         Me.Controls.Add(Me.lblLaunchOption)

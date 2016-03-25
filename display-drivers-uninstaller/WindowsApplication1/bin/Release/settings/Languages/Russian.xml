@@ -54,33 +54,36 @@
 		</Label10>
 		<Label11>
 			<Text>Идёт проверка обновлений...</Text>
+			<Text2>Никаких обновлений не найдено. Программа находится в актуальном состоянии.</Text2>
+			<Text3>Обновления найдены! Ожидайте ограниченную поддержку на более старых версиях,чем последняя.</Text3>
+			<Text4>Невозможно получить обновления!</Text4>
 		</Label11>
 		<OptionsToolStripMenuItem>
-			<Text>Options</Text>
+			<Text>Опции</Text>
 		</OptionsToolStripMenuItem>
 		<ToolStripMenuItem1>
-			<Text>?</Text>
+			<Text>Справка</Text>
 		</ToolStripMenuItem1>
 		<ToSToolStripMenuItem>
-			<Text>ToS</Text>
+			<Text>Пользовательское соглашение</Text>
 		</ToSToolStripMenuItem>
 		<VisitDDUHomepageToolStripMenuItem>
-			<Text>Visit official DDU Website</Text>
+			<Text>Перейти на официальный сайт DDU</Text>
 		</VisitDDUHomepageToolStripMenuItem>
 		<SVNToolStripMenuItem>
-			<Text>Visit SVN Website</Text>
+			<Text>Перейти сайт SVN</Text>
 		</SVNToolStripMenuItem>
 		<VisitGuru3dNVIDIAThreadToolStripMenuItem>
-			<Text>Visit Guru3d NVIDIA Thread</Text>
+			<Text>Посетить тему NVIDIA на Guru3d</Text>
 		</VisitGuru3dNVIDIAThreadToolStripMenuItem>
 		<VisitGuru3dAMDThreadToolStripMenuItem>
-			<Text>Visit Guru3d AMD Thread</Text>
+			<Text>Посетить тему AMD на Guru3d</Text>
 		</VisitGuru3dAMDThreadToolStripMenuItem>
 		<VisitGeforceThreadToolStripMenuItem>
-			<Text>Visit Geforce Thread</Text>
+			<Text>Посетить тему Geforce</Text>
 		</VisitGeforceThreadToolStripMenuItem>
 		<AboutToolStripMenuItem>
-			<Text>About</Text>
+			<Text>О DDU</Text>
 		</AboutToolStripMenuItem>
 		<Messages>
 			<Text1>Доступны обновления! Посетить вебсайт DDU сейчас?</Text1>
@@ -95,46 +98,47 @@
 			<Text10>Процесс Чистки и удаления выполнен! Вы хотите выйти сейчас?</Text10>
 			<Text11>Сделано!</Text11>
 			<Text12>Вы не в Безопасном режиме. Настоятельно рекомендуется перезагрузка в Безопасном режиме, чтобы избежать возможных проблем. Перезагрузиться в безопасном режиме сейчас?</Text12>
-			<Text13>Here is what you need to select at the blue recovery screen : Troubleshoot-&gt; advanced options -&gt; startup Settings.</Text13>
+			<Text13>Вот что вам необходимо выбрать на синем экране восстановления: Исправить неполадки -&gt; Дополнительные параметры-&gt; Настройки загрузки.</Text13>
+			<Text14>Существует отложенная перезагрузка, выполните её, прежде чем использовать DDU</Text14>
 		</Messages>
 		<UpdateLog>
-			<Text1>Executing Driver Store cleanUP(Delete OEM step)...</Text1>
+			<Text1>Выполнение очистки хранилища драйверов Windows (шаг удаления OEM)...</Text1>
 			<Text2>Чистка папки.</Text2>
-			<Text3>Cleaning known Regkeys... May take a minute or two.</Text3>
-			<Text4>Cleaning UpdatusUser users account if present.</Text4>
+			<Text3>Очистка известных ключей реестра... Это может занять минуту или две.</Text3>
+			<Text4>Очистка учетных записей пользователей UpdatusUser, если такие есть.</Text4>
 			<Text5>Чистка папки.</Text5>
 			<Text6>Начата чистка реестра.</Text6>
 			<Text7>Завершена чистка реестра.</Text7>
-			<Text8>Starting the removal of nVidia Optimus UpperFilter if present.</Text8>
+			<Text8>Запуск удаления NVIDIA Optimus UpperFilter, если он есть.</Text8>
 			<Text9>Проверка нового устройства...</Text9>
 			<Text10>Полное удаление завершено!</Text10>
 			<Text11>Версия DDU:</Text11>
-			<Text12>GPU #</Text12>
+			<Text12>Графический процессор #</Text12>
 			<Text13>Обнаружено:</Text13>
-			<Text14>GPU DeviceId :</Text14>
-			<Text15>Detected Driver(s) Version(s) :</Text15>
+			<Text14>DeviceId графического процессора:</Text14>
+			<Text15>Обнаруженая(ные) версия(и) драйвера(ов):</Text15>
 			<Text16>INF :</Text16>
-			<Text17>INF Section :</Text17>
-			<Text18>GPU not Correctly Installed :</Text18>
-			<Text19>Deleting some specials folders, it may take some times...</Text19>
+			<Text17>INF Раздел :</Text17>
+			<Text18>Графический процессор установлен правильно :</Text18>
+			<Text19>Удаление некоторых специальных папок, это может занять некоторое время...</Text19>
 			<Text20>Чистка начата...</Text20>
 			<Text21>Удаление</Text21>
 			<Text22>Драйвер</Text22>
-			<Text23>Executing ddudr Remove , Please wait(can take a few minutes)</Text23>
-			<Text24>GPU(s) Removed from Device Manager.</Text24>
-			<Text25>Executing DDUDR Remove Audio controller.</Text25>
-			<Text26>HD audio adapters Removed !</Text26>
-			<Text27>3D Vision USB Adapter Removed from Device Manager.</Text27>
-			<Text28>Monitors and Hidden monitors removed !</Text28>
-			<Text29>ddudr Remove complete</Text29>
-			<Text30>Starting S-1-5-xx region cleanUP</Text30>
-			<Text31>End of S-1-5-xx region cleanUP</Text31>
-			<Text32>Begin Classesroot ,installer\products cleanup</Text32>
-			<Text33>End Classesroot ,installer\products cleanup</Text33>
-			<Text34>Start localmachine ,installer\products cleanup</Text34>
-			<Text35>End localmachine ,installer\products cleanup</Text35>
-			<Text36>Start currentuser ,installer\products cleanup</Text36>
-			<Text37>End currentuser ,installer\products cleanup</Text37>
+			<Text23>Выполнение удаления DDUDR. Пожалуйста, подождите (это может занять несколько минут)</Text23>
+			<Text24>Графический(е) процессор(ы) удален(ы) из диспетчера устройств.</Text24>
+			<Text25>Выполнение удаления DDUDR аудио контроллера.</Text25>
+			<Text26>HD аудио адаптеры удалены!</Text26>
+			<Text27>Адаптер 3D Vision USB удален из диспетчера устройств.</Text27>
+			<Text28>Мониторы и скрытые мониторы удалены!</Text28>
+			<Text29>Удаление DDUDR завершено</Text29>
+			<Text30>Начало очистки области S-1-5-xx </Text30>
+			<Text31>Конец очистки области S-1-5-xx </Text31>
+			<Text32>Начало очистки Classesroot ,installer\products cleanup</Text32>
+			<Text33>Конец очистки Classesroot ,installer\products cleanup</Text33>
+			<Text34>Начало очистки localmachine ,installer\products cleanup</Text34>
+			<Text35>Конец очистки localmachine ,installer\products cleanup</Text35>
+			<Text36>Начало очистки currentuser ,installer\products cleanup</Text36>
+			<Text37>Конец очистки currentuser ,installer\products cleanup</Text37>
 			<Text38>Чистка Процессов/Служб...</Text38>
 			<Text39>Очистка Процессов/Служб выполнена</Text39>
 			<Text40>Удалено.</Text40>
@@ -144,7 +148,7 @@
 	</frmMain>
 	<frmOptions Text="Опции">
 		<Label1>
-			<Text>Специфические параметры GPUs</Text>
+			<Text>Специфические параметры для GPUs</Text>
 		</Label1>
 		<Label2>
 			<Text>Общие параметры</Text>
@@ -153,7 +157,7 @@
 			<Text>Удалить папку с драверами "C:\nVidia" ( Не рекомендуется )</Text>
 		</CheckBox1>
 		<CheckBox2>
-			<Text>Сохранять файлы журналов в папке программы\n(рекомендуется)</Text>
+			<Text>Сохранять файлы журналов в папке программы (рекомендуется)</Text>
 		</CheckBox2>
 		<CheckBox3>
 			<Text>Удалить PhysX</Text>
@@ -162,60 +166,60 @@
 			<Text>Удалить 3DTV Play</Text>
 		</CheckBox4>
 		<CheckBox5>
-			<Text>Создать точку восстановления для Восстановления\nсистемы (если разрешено)</Text>
+			<Text>Создать точку восстановления для Восстановления системы (если разрешено)</Text>
 		</CheckBox5>
 		<CheckBox6>
-			<Text>Удалить существующие и не существующие мониторы\n(рекомендуется)</Text>
+			<Text>Удалить существующие и не существующие мониторы (рекомендуется)</Text>
 		</CheckBox6>
 		<CheckBox7>
 			<Text>Удалить AMD Audio Bus</Text>
 		</CheckBox7>
 		<CheckBox8>
-			<Text>Удалить папку с дравверами "C:\AMD" ( Не рекомендуется )</Text>
+			<Text>Удалить папку с драверами "C:\AMD" ( Не рекомендуется )</Text>
 		</CheckBox8>
 		<CheckBox9>
 			<Text>Удалить драйвер/фильтр AMDKMPFD ( рекомендуется резервное копирование для чипсета AMD )</Text>
 		</CheckBox9>
 		<CheckBox10>
-			<Text>Показать окно с сообщением о безопасном режиме\nпри запуске программы</Text>
+			<Text>Показать окно с сообщением о безопасном режиме при запуске программы</Text>
 		</CheckBox10>
 		<CheckBox11>
-			<Text>Сохранить конфигурационный файл в перемещаемой\nпапке (могут быть ошибки)|</Text>
+			<Text>Сохранить конфигурационный файл в перемещаемой папке (могут быть ошибки)|</Text>
 		</CheckBox11>
 		<CheckBox12>
-			<Text>Не проверять наличие обновлений при запуске DDU\n( не рекомендуется)</Text>
+			<Text>Не проверять наличие обновлений при запуске DDU ( не рекомендуется)</Text>
 		</CheckBox12>
 		<CheckBox13>
-			<Text>Remove Geforce Experience (GFE)</Text>
+			<Text>Удалить Geforce Experience (GFE)</Text>
 		</CheckBox13>
 		<CheckBox14>
-			<Text>Remove AMD Crimson Shader Cache folder</Text>
-			<Tooltip>Recommended if there is graphicals anomaly (speed or visual corruption) caused by a corrupted shader cache data.|Also recommended if you are switching to another brand like nVidia.</Tooltip>
+			<Text>Очистить директорию AMD Crimson Shader Cache</Text>
+			<Tooltip>Рекомендуется при наличии графических аномалий (скорости или визуальных искажений) из-за повреждения кэша данных шейдеров.|Также рекомендуется, если вы переходите к другой марке, например nVidia.</Tooltip>
 		</CheckBox14>
 	</frmOptions>
-	<frmLaunch Text="Launch option">
+	<frmLaunch Text="Варианты запуска">
 		<btnAccept>
-			<Text>Launch</Text>
-			<Text2>Reboot to|Safe Mode</Text2>
+			<Text>Запуск</Text>
+			<Text2>Перезагрузка|безопасный режим</Text2>
 		</btnAccept>
 		<btnClose>
-			<Text>Close</Text>
+			<Text>Закрыть</Text>
 		</btnClose>
 		<lblLaunchOption>
-			<Text>Launch option</Text>
+			<Text>Варианты запуска</Text>
 		</lblLaunchOption>
 		<lblNotSafeMode>
-			<Text>You are not in safe mode. It is highly recommended|reboot into Safe Mode to avoid possible issues.</Text>
+			<Text>Система работает не в безопасном режиме. Чтобы избежать|возможных проблем, НАСТОЯТЕЛЬНО РЕКОМЕНДОВАНО|перезагрузиться в безопасном режиме.</Text>
 		</lblNotSafeMode>
 		<cbBootOption>
-			<Item1>Normal</Item1>
-			<Item2>Safe Mode (Recommended)</Item2>
-			<Item3>Safe Mode With Networking</Item3>
+			<Item1>Нормальный режим</Item1>
+			<Item2>Безопасный режим (рекомендуется)</Item2>
+			<Item3>Безопасный режим с поддержкой сети</Item3>
 		</cbBootOption>
 	</frmLaunch>
-	<frmLog Text="Extended log">
+	<frmLog Text="Расширенный журнал">
      	<btnClose>
-			<Text>Close</Text>
+			<Text>Закрыть</Text>
 		</btnClose>
 	</frmLog>
 	<frmAbout>
