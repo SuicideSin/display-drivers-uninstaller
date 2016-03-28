@@ -295,10 +295,10 @@ Partial Class frmMain
         '
         Me.PictureBox2.ErrorImage = Nothing
         Me.PictureBox2.Image = Global.WindowsApplication1.My.Resources.Resources.NV_GF_GTX_preferred_badge_FOR_WEB_ONLY
-        Me.PictureBox2.Location = New System.Drawing.Point(333, 92)
+        Me.PictureBox2.Location = New System.Drawing.Point(301, 92)
         Me.PictureBox2.Name = "PictureBox2"
-        Me.PictureBox2.Size = New System.Drawing.Size(158, 126)
-        Me.PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+        Me.PictureBox2.Size = New System.Drawing.Size(220, 126)
+        Me.PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.PictureBox2.TabIndex = 20
         Me.PictureBox2.TabStop = False
         '
