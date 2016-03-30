@@ -59,7 +59,7 @@
 			<Text4>無法擷取更新!</Text4>
 		</Label11>
 		<OptionsToolStripMenuItem>
-			<Text>Options</Text>
+			<Text>選項</Text>
 		</OptionsToolStripMenuItem>
 		<ToolStripMenuItem1>
 			<Text>?</Text>
@@ -68,22 +68,22 @@
 			<Text>ToS</Text>
 		</ToSToolStripMenuItem>
 		<VisitDDUHomepageToolStripMenuItem>
-			<Text>Visit official DDU Website</Text>
+			<Text>造訪官方 DDU 網站</Text>
 		</VisitDDUHomepageToolStripMenuItem>
 		<SVNToolStripMenuItem>
-			<Text>Visit SVN Website</Text>
+			<Text>造訪 SVN 網站</Text>
 		</SVNToolStripMenuItem>
 		<VisitGuru3dNVIDIAThreadToolStripMenuItem>
-			<Text>Visit Guru3d NVIDIA Thread</Text>
+			<Text>造訪 Guru3d NVIDIA 討論串</Text>
 		</VisitGuru3dNVIDIAThreadToolStripMenuItem>
 		<VisitGuru3dAMDThreadToolStripMenuItem>
-			<Text>Visit Guru3d AMD Thread</Text>
+			<Text>造訪 Guru3d AMD 討論串</Text>
 		</VisitGuru3dAMDThreadToolStripMenuItem>
 		<VisitGeforceThreadToolStripMenuItem>
-			<Text>Visit Geforce Thread</Text>
+			<Text>造訪 Geforce 討論串</Text>
 		</VisitGeforceThreadToolStripMenuItem>
 		<AboutToolStripMenuItem>
-			<Text>About</Text>
+			<Text>關於</Text>
 		</AboutToolStripMenuItem>
 		<Messages>
 			<Text1>有更新可用!立即造訪 DDU 網站嗎?</Text1>
@@ -197,30 +197,30 @@
 			<Tooltip>建議如果有損壞的著色器快取資料引起的圖形化異常(速度或視覺效果損毀)。|此外建議如果您切換到另一個像 nVidia 這樣的品牌。</Tooltip>
 		</CheckBox14>
 	</frmOptions>
-	<frmLaunch Text="Launch option">
+	<frmLaunch Text="啟動選項">
 		<btnAccept>
-			<Text>Launch</Text>
+			<Text>啟動</Text>
 			<Text2>Reboot to|Safe Mode</Text2>
 		</btnAccept>
 		<btnClose>
-			<Text>Close</Text>
+			<Text>關閉</Text>
 		</btnClose>
 		<lblLaunchOption>
-			<Text>Launch option</Text>
+			<Text>啟動選項</Text>
 		</lblLaunchOption>
 		<lblNotSafeMode>
-			<Text>You are not in safe mode. It is highly recommended|reboot into Safe Mode to avoid possible issues.</Text>
+			<Text>您目前不在安全模式下。強烈建議重新啟動進入安全模式以|避免可能出現的問題。</Text>
 		</lblNotSafeMode>
 		<cbBootOption>
-			<Item1>Normal</Item1>
-			<Item2>Safe Mode (Recommended)</Item2>
-			<Item3>Safe Mode With Networking</Item3>
+			<Item1>正常模式</Item1>
+			<Item2>安全模式(建議選項)</Item2>
+			<Item3>安全模式 (含網路功能)</Item3>
 		</cbBootOption>
 	</frmLaunch>
-	<frmLog Text="Extended log">
-		<btnClose>
-			<Text>Close</Text>
-		</btnClose>	
+	<frmLog Text="Extended log">		
+    <btnClose>
+      <Text>關閉</Text>
+    </btnClose>
 	</frmLog>
 	<frmAbout>
 		<Label1>
