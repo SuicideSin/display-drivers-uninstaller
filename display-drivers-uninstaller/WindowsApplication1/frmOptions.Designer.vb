@@ -43,6 +43,7 @@ Partial Class frmOptions
 		Me.CheckBox12 = New System.Windows.Forms.CheckBox()
 		Me.CheckBox13 = New System.Windows.Forms.CheckBox()
 		Me.CheckBox14 = New System.Windows.Forms.CheckBox()
+		Me.cbxVulkan = New System.Windows.Forms.CheckBox()
 		CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
 		CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
 		CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -51,7 +52,7 @@ Partial Class frmOptions
 		'CheckBox6
 		'
 		Me.CheckBox6.AutoSize = True
-		Me.CheckBox6.Location = New System.Drawing.Point(357, 121)
+		Me.CheckBox6.Location = New System.Drawing.Point(357, 91)
 		Me.CheckBox6.Name = "CheckBox6"
 		Me.CheckBox6.Size = New System.Drawing.Size(307, 17)
 		Me.CheckBox6.TabIndex = 34
@@ -61,7 +62,7 @@ Partial Class frmOptions
 		'CheckBox5
 		'
 		Me.CheckBox5.AutoSize = True
-		Me.CheckBox5.Location = New System.Drawing.Point(357, 80)
+		Me.CheckBox5.Location = New System.Drawing.Point(357, 68)
 		Me.CheckBox5.Name = "CheckBox5"
 		Me.CheckBox5.Size = New System.Drawing.Size(153, 17)
 		Me.CheckBox5.TabIndex = 33
@@ -202,7 +203,7 @@ Partial Class frmOptions
 		'CheckBox10
 		'
 		Me.CheckBox10.AutoSize = True
-		Me.CheckBox10.Location = New System.Drawing.Point(357, 158)
+		Me.CheckBox10.Location = New System.Drawing.Point(357, 114)
 		Me.CheckBox10.Name = "CheckBox10"
 		Me.CheckBox10.Size = New System.Drawing.Size(223, 17)
 		Me.CheckBox10.TabIndex = 46
@@ -212,7 +213,7 @@ Partial Class frmOptions
 		'CheckBox11
 		'
 		Me.CheckBox11.AutoSize = True
-		Me.CheckBox11.Location = New System.Drawing.Point(357, 195)
+		Me.CheckBox11.Location = New System.Drawing.Point(357, 137)
 		Me.CheckBox11.Name = "CheckBox11"
 		Me.CheckBox11.Size = New System.Drawing.Size(179, 17)
 		Me.CheckBox11.TabIndex = 47
@@ -222,7 +223,7 @@ Partial Class frmOptions
 		'CheckBox12
 		'
 		Me.CheckBox12.AutoSize = True
-		Me.CheckBox12.Location = New System.Drawing.Point(357, 227)
+		Me.CheckBox12.Location = New System.Drawing.Point(357, 160)
 		Me.CheckBox12.Name = "CheckBox12"
 		Me.CheckBox12.Size = New System.Drawing.Size(331, 17)
 		Me.CheckBox12.TabIndex = 48
@@ -249,11 +250,22 @@ Partial Class frmOptions
 		Me.CheckBox14.Text = "Remove AMD Crimson Shader cache"
 		Me.CheckBox14.UseVisualStyleBackColor = True
 		'
-		'options
+		'cbxVulkan
+		'
+		Me.cbxVulkan.AutoSize = True
+		Me.cbxVulkan.Location = New System.Drawing.Point(357, 183)
+		Me.cbxVulkan.Name = "cbxVulkan"
+		Me.cbxVulkan.Size = New System.Drawing.Size(139, 17)
+		Me.cbxVulkan.TabIndex = 51
+		Me.cbxVulkan.Text = "Remove Vulkan runtime"
+		Me.cbxVulkan.UseVisualStyleBackColor = True
+		'
+		'frmOptions
 		'
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
 		Me.ClientSize = New System.Drawing.Size(675, 630)
+		Me.Controls.Add(Me.cbxVulkan)
 		Me.Controls.Add(Me.CheckBox14)
 		Me.Controls.Add(Me.CheckBox13)
 		Me.Controls.Add(Me.CheckBox12)
@@ -308,4 +320,5 @@ Partial Class frmOptions
 	Friend WithEvents CheckBox12 As CheckBox
 	Friend WithEvents CheckBox13 As System.Windows.Forms.CheckBox
 	Friend WithEvents CheckBox14 As System.Windows.Forms.CheckBox
+	Friend WithEvents cbxVulkan As System.Windows.Forms.CheckBox
 End Class

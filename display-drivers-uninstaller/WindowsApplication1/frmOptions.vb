@@ -167,6 +167,13 @@ Public Class frmOptions
 			removedxcache = False
 		End If
 
+		If settings.getconfig("removevulkan") = "true" Then
+			cbxVulkan.Checked = True
+			removevulkan = True
+		Else
+			cbxVulkan.Checked = False
+			removevulkan = False
+		End If
 
 		'-------------------------------------
 		'Resize the option window if necessary
@@ -385,6 +392,16 @@ Public Class frmOptions
 		Else
 			setconfig("removedxcache", "false")
 			removedxcache = False
+		End If
+	End Sub
+
+	Private Sub cbxVulkan_CheckedChanged(sender As Object, e As EventArgs) Handles cbxVulkan.CheckedChanged
+		If cbxVulkan.Checked Then
+			setconfig("removevulkan", "true")
+			removevulkan = True
+		Else
+			setconfig("removevulkan", "false")
+			removevulkan = False
 		End If
 	End Sub
 End Class

@@ -68,7 +68,8 @@ Public Class frmMain
     Public Shared roamingcfg As Boolean
     Public Shared donotcheckupdatestartup As Boolean
     Public Shared trysystemrestore As Boolean
-    Public Shared removegfe As Boolean
+	Public Shared removegfe As Boolean
+	Public Shared removevulkan As Boolean
 
     Dim f As New frmOptions
 	Dim locations As String = Application.StartupPath & "\DDU Logs\" & DateAndTime.Now.Year & " _" & DateAndTime.Now.Month & "_" & DateAndTime.Now.Day _
@@ -1381,17 +1382,26 @@ Public Class frmMain
                             End Try
                         End If
                     End If
-                Next
-                If regkey.GetValueNames().Length = 0 Then
-                    Try
-                        deletesubregkey(My.Computer.Registry.LocalMachine, "Software\Khronos")
-                    Catch ex As Exception
-                    End Try
-                End If
-            End If
-        Catch ex As Exception
-        End Try
-
+				Next
+				If regkey.GetValueNames().Length = 0 Then
+					Try
+						deletesubregkey(My.Computer.Registry.LocalMachine, "Software\Khronos\OpenCL")
+					Catch ex As Exception
+					End Try
+				End If
+				CleanVulkan()
+				regkey = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Khronos", True)
+				If regkey IsNot Nothing Then
+					If regkey.GetSubKeyNames().Length = 0 Then
+						Try
+							deletesubregkey(My.Computer.Registry.LocalMachine, "Software\Khronos")
+						Catch ex As Exception
+						End Try
+					End If
+				End If
+			End If
+		Catch ex As Exception
+		End Try
         If IntPtr.Size = 8 Then
 
             Try
@@ -1406,16 +1416,25 @@ Public Class frmMain
                                 End Try
                             End If
                         End If
-                    Next
-                    If regkey.GetValueNames().Length = 0 Then
-                        Try
-                            deletesubregkey(My.Computer.Registry.LocalMachine, "Software\Wow6432Node\Khronos")
-                        Catch ex As Exception
-                        End Try
-                    End If
-                End If
-            Catch ex As Exception
-            End Try
+					Next
+					If regkey.GetValueNames().Length = 0 Then
+						Try
+							deletesubregkey(My.Computer.Registry.LocalMachine, "Software\WOW6432Node\Khronos\OpenCL")
+						Catch ex As Exception
+						End Try
+					End If
+					regkey = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\WOW6432Node\Khronos", True)
+					If regkey IsNot Nothing Then
+						If regkey.GetSubKeyNames().Length = 0 Then
+							Try
+								deletesubregkey(My.Computer.Registry.LocalMachine, "Software\WOW6432Node\Khronos")
+							Catch ex As Exception
+							End Try
+						End If
+					End If
+				End If
+			Catch ex As Exception
+			End Try
         End If
 
         log("ngenservice Clean")
@@ -2115,10 +2134,12 @@ Public Class frmMain
                                     For i As Integer = 0 To packages.Length - 1
                                         If Not checkvariables.isnullorwhitespace(packages(i)) Then
                                             If wantedvalue.ToLower.Contains(packages(i).ToLower) Then
-                                                Try
-                                                    deletesubregkey(regkey, child)
-                                                Catch ex As Exception
-                                                End Try
+												Try
+													If Not (removevulkan = False AndAlso wantedvalue.ToLower.Contains("vulkan")) Then
+														deletesubregkey(regkey, child)
+													End If
+												Catch ex As Exception
+												End Try
                                             End If
                                         End If
                                     Next
@@ -2534,7 +2555,35 @@ Public Class frmMain
 		Catch ex As Exception
 		End Try
 	End Sub
+	Private Sub CleanVulkan()
+		Dim regkey As RegistryKey = Nothing
 
+		If removevulkan Then
+			regkey = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Khronos", True)
+			If regkey IsNot Nothing Then
+				For Each child As String In regkey.GetSubKeyNames
+					If Not checkvariables.isnullorwhitespace(child) Then
+						If child.ToLower.Contains("vulkan") Then
+							deletesubregkey(regkey, child)
+						End If
+					End If
+				Next
+			End If
+			If IntPtr.Size = 8 Then
+				regkey = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\WOW6432Node\Khronos", True)
+				If regkey IsNot Nothing Then
+					For Each child As String In regkey.GetSubKeyNames
+						If Not checkvariables.isnullorwhitespace(child) Then
+							If child.ToLower.Contains("vulkan") Then
+								deletesubregkey(regkey, child)
+							End If
+						End If
+					Next
+				End If
+			End If
+		End If
+
+	End Sub
     Private Sub cleannvidiafolders()
         Dim regkey As RegistryKey = Nothing
         Dim subregkey As RegistryKey = Nothing
@@ -2964,412 +3013,488 @@ Public Class frmMain
             CleanupEngine.shareddlls(filePath)
         End If
 
+		If removevulkan Then
+			filePath = Environment.GetFolderPath _
+		(Environment.SpecialFolder.ProgramFiles) + "\VulkanRT"
+			If Directory.Exists(filePath) Then
+				Try
+					deletedirectory(filePath)
+				Catch ex As Exception
+				End Try
+			End If
+			If Not Directory.Exists(filePath) Then
+				CleanupEngine.shareddlls(filePath)
+			End If
+		End If
 
-        If IntPtr.Size = 8 Then
-            filePath = Environment.GetFolderPath _
-                (Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\NVIDIA Corporation"
-            If Directory.Exists(filePath) Then
-                For Each child As String In Directory.GetDirectories(filePath)
-                    If checkvariables.isnullorwhitespace(child) = False Then
-                        If child.ToLower.Contains("3d vision") Or
-                           child.ToLower.Contains("coprocmanager") Or
-                           child.ToLower.Contains("led visualizer") AndAlso removegfe Or
-                           child.ToLower.Contains("osc") AndAlso removegfe Or
-                           child.ToLower.Contains("netservice") AndAlso removegfe Or
-                           child.ToLower.Contains("nvidia geforce experience") AndAlso removegfe Or
-                           child.ToLower.Contains("nvstreamc") AndAlso removegfe Or
-                           child.ToLower.Contains("nvstreamsrv") AndAlso removegfe Or
-                           child.ToLower.Contains("update common") AndAlso removegfe Or
-                           child.ToLower.Contains("nvgsync") Or
-                           child.ToLower.EndsWith("\physx") Or
-                           child.ToLower.Contains("update core") AndAlso removegfe Then
-                            If removephysx Then
-                                Try
-                                    deletedirectory(child)
-                                Catch ex As Exception
-                                    log(ex.Message)
-                                    TestDelete(child)
-                                End Try
-                            Else
-                                If child.ToLower.Contains("physx") Then
-                                    'do nothing
-                                Else
-                                    Try
-                                        deletedirectory(child)
-                                    Catch ex As Exception
-                                        log(ex.Message)
-                                        TestDelete(child)
-                                    End Try
-                                End If
-                            End If
-                            If Not Directory.Exists(child) Then
-                                CleanupEngine.shareddlls(child)
-                            End If
-                        End If
-                    End If
-                Next
+		If IntPtr.Size = 8 Then
+			filePath = Environment.GetFolderPath _
+				(Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\NVIDIA Corporation"
+			If Directory.Exists(filePath) Then
+				For Each child As String In Directory.GetDirectories(filePath)
+					If checkvariables.isnullorwhitespace(child) = False Then
+						If child.ToLower.Contains("3d vision") Or
+						   child.ToLower.Contains("coprocmanager") Or
+						   child.ToLower.Contains("led visualizer") AndAlso removegfe Or
+						   child.ToLower.Contains("osc") AndAlso removegfe Or
+						   child.ToLower.Contains("netservice") AndAlso removegfe Or
+						   child.ToLower.Contains("nvidia geforce experience") AndAlso removegfe Or
+						   child.ToLower.Contains("nvstreamc") AndAlso removegfe Or
+						   child.ToLower.Contains("nvstreamsrv") AndAlso removegfe Or
+						   child.ToLower.Contains("update common") AndAlso removegfe Or
+						   child.ToLower.Contains("nvgsync") Or
+						   child.ToLower.EndsWith("\physx") Or
+						   child.ToLower.Contains("update core") AndAlso removegfe Then
+							If removephysx Then
+								Try
+									deletedirectory(child)
+								Catch ex As Exception
+									log(ex.Message)
+									TestDelete(child)
+								End Try
+							Else
+								If child.ToLower.Contains("physx") Then
+									'do nothing
+								Else
+									Try
+										deletedirectory(child)
+									Catch ex As Exception
+										log(ex.Message)
+										TestDelete(child)
+									End Try
+								End If
+							End If
+							If Not Directory.Exists(child) Then
+								CleanupEngine.shareddlls(child)
+							End If
+						End If
+					End If
+				Next
 
-                If Directory.GetDirectories(filePath).Length = 0 Then
-                    Try
-                        deletedirectory(filePath)
-                    Catch ex As Exception
-                        log(ex.Message)
-                        TestDelete(filePath)
-                    End Try
-                Else
-                    For Each data As String In Directory.GetDirectories(filePath)
-                        log("Remaining folders found " + " : " + data)
-                    Next
+				If Directory.GetDirectories(filePath).Length = 0 Then
+					Try
+						deletedirectory(filePath)
+					Catch ex As Exception
+						log(ex.Message)
+						TestDelete(filePath)
+					End Try
+				Else
+					For Each data As String In Directory.GetDirectories(filePath)
+						log("Remaining folders found " + " : " + data)
+					Next
 
-                End If
-            End If
-            If Not Directory.Exists(filePath) Then
-                CleanupEngine.shareddlls(filePath)
-            End If
-        End If
-
-
-
-        If IntPtr.Size = 8 Then
-            filePath = Environment.GetFolderPath _
-                (Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\AGEIA Technologies"
-            If Directory.Exists(filePath) Then
-                Try
-                    deletedirectory(filePath)
-                Catch ex As Exception
-                End Try
-            End If
-            If Not Directory.Exists(filePath) Then
-                CleanupEngine.shareddlls(filePath)
-            End If
-        End If
-
-
-        CleanupEngine.folderscleanup(IO.File.ReadAllLines(Application.StartupPath & "\settings\NVIDIA\driverfiles.cfg")) '// add each line as String Array.
-        If removegfe Then
-            CleanupEngine.folderscleanup(IO.File.ReadAllLines(Application.StartupPath & "\settings\NVIDIA\gfedriverfiles.cfg")) '// add each line as String Array.
-        End If
-
-        filePath = System.Environment.SystemDirectory
-        Dim files() As String = IO.Directory.GetFiles(filePath + "\", "nvdisp*.*")
-        For i As Integer = 0 To files.Length - 1
-            If Not checkvariables.isnullorwhitespace(files(i)) Then
-                Try
-                    deletefile(files(i))
-                Catch ex As Exception
-                End Try
-            End If
-        Next
-
-        filePath = System.Environment.SystemDirectory
-        files = IO.Directory.GetFiles(filePath + "\", "nvhdagenco*.*")
-        For i As Integer = 0 To files.Length - 1
-            If Not checkvariables.isnullorwhitespace(files(i)) Then
-                Try
-                    deletefile(files(i))
-                Catch ex As Exception
-                End Try
-            End If
-        Next
-
-        filePath = Environment.GetEnvironmentVariable("windir")
-        Try
-            deletedirectory(filePath + "\Help\nvcpl")
-        Catch ex As Exception
-        End Try
-
-        Try
-            filePath = Environment.GetEnvironmentVariable("windir") + "\Temp\NVIDIA Corporation"
-            For Each child As String In Directory.GetDirectories(filePath)
-                If checkvariables.isnullorwhitespace(child) = False Then
-                    If child.ToLower.Contains("nv_cache") Then
-                        Try
-                            deletedirectory(child)
-                        Catch ex As Exception
-                            log(ex.Message)
-                            TestDelete(child)
-                        End Try
-                    End If
-                End If
-            Next
-            Try
-                If Directory.GetDirectories(filePath).Length = 0 Then
-                    Try
-                        deletedirectory(filePath)
-                    Catch ex As Exception
-                        log(ex.Message)
-                        TestDelete(filePath)
-                    End Try
-                Else
-                    For Each data As String In Directory.GetDirectories(filePath)
-                        log("Remaining folders found " + " : " + data)
-                    Next
-
-                End If
-            Catch ex As Exception
-            End Try
-        Catch ex As Exception
-        End Try
+				End If
+			End If
+			If Not Directory.Exists(filePath) Then
+				CleanupEngine.shareddlls(filePath)
+			End If
+		End If
 
 
 
-        For Each filepaths As String In Directory.GetDirectories(IO.Path.GetDirectoryName(userpth))
+		If IntPtr.Size = 8 Then
+			filePath = Environment.GetFolderPath _
+				(Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\AGEIA Technologies"
+			If Directory.Exists(filePath) Then
+				Try
+					deletedirectory(filePath)
+				Catch ex As Exception
+				End Try
+			End If
+			If Not Directory.Exists(filePath) Then
+				CleanupEngine.shareddlls(filePath)
+			End If
+		End If
 
-            filePath = filepaths + "\AppData\Local\Temp\NVIDIA Corporation"
+		If removevulkan Then
+			If IntPtr.Size = 8 Then
+				filePath = Environment.GetFolderPath _
+					(Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\VulkanRT"
+				If Directory.Exists(filePath) Then
+					Try
+						deletedirectory(filePath)
+					Catch ex As Exception
+					End Try
+				End If
+				If Not Directory.Exists(filePath) Then
+					CleanupEngine.shareddlls(filePath)
+				End If
+			End If
+		End If
 
-            Try
-                For Each child As String In My.Computer.FileSystem.GetDirectories(filePath)
-                    If checkvariables.isnullorwhitespace(child) = False Then
-                        If child.ToLower.Contains("nv_cache") Or
-                            child.ToLower.Contains("displaydriver") Then
-                            Try
-                                deletedirectory(child)
-                            Catch ex As Exception
-                                log(ex.Message)
-                                TestDelete(child)
-                            End Try
-                        End If
-                    End If
-                Next
-                Try
-                    If Directory.GetDirectories(filePath).Length = 0 Then
-                        Try
-                            deletedirectory(filePath)
-                        Catch ex As Exception
-                            log(ex.Message)
-                            TestDelete(filePath)
-                        End Try
-                    Else
-                        For Each data As String In Directory.GetDirectories(filePath)
-                            log("Remaining folders found " + " : " + data)
-                        Next
+		CleanupEngine.folderscleanup(IO.File.ReadAllLines(Application.StartupPath & "\settings\NVIDIA\driverfiles.cfg")) '// add each line as String Array.
+		If removegfe Then
+			CleanupEngine.folderscleanup(IO.File.ReadAllLines(Application.StartupPath & "\settings\NVIDIA\gfedriverfiles.cfg"))	'// add each line as String Array.
+		End If
 
-                    End If
-                Catch ex As Exception
-                End Try
-            Catch ex As Exception
-            End Try
+		filePath = System.Environment.SystemDirectory
+		Dim files() As String = IO.Directory.GetFiles(filePath + "\", "nvdisp*.*")
+		For i As Integer = 0 To files.Length - 1
+			If Not checkvariables.isnullorwhitespace(files(i)) Then
+				Try
+					deletefile(files(i))
+				Catch ex As Exception
+				End Try
+			End If
+		Next
 
-            filePath = filepaths + "\AppData\Local\Temp\NVIDIA"
+		filePath = System.Environment.SystemDirectory
+		files = IO.Directory.GetFiles(filePath + "\", "nvhdagenco*.*")
+		For i As Integer = 0 To files.Length - 1
+			If Not checkvariables.isnullorwhitespace(files(i)) Then
+				Try
+					deletefile(files(i))
+				Catch ex As Exception
+				End Try
+			End If
+		Next
 
-            Try
-                For Each child As String In My.Computer.FileSystem.GetDirectories(filePath)
-                    If checkvariables.isnullorwhitespace(child) = False Then
-                        If child.ToLower.Contains("geforceexperienceselfupdate") AndAlso removegfe Or _
-                           child.ToLower.Contains("displaydriver") Then
-                            Try
-                                deletedirectory(child)
-                            Catch ex As Exception
-                                log(ex.Message)
-                                TestDelete(child)
-                            End Try
-                        End If
-                    End If
-                Next
-                Try
-                    If Directory.GetDirectories(filePath).Length = 0 Then
-                        Try
-                            deletedirectory(filePath)
-                        Catch ex As Exception
-                            log(ex.Message)
-                            TestDelete(filePath)
-                        End Try
-                    Else
-                        For Each data As String In Directory.GetDirectories(filePath)
-                            log("Remaining folders found " + " : " + data)
-                        Next
+		If removevulkan Then
+			filePath = System.Environment.SystemDirectory
+			files = IO.Directory.GetFiles(filePath + "\", "vulkan-1*.dll")
+			For i As Integer = 0 To files.Length - 1
+				If Not checkvariables.isnullorwhitespace(files(i)) Then
+					Try
+						deletefile(files(i))
+					Catch ex As Exception
+					End Try
+				End If
+			Next
 
-                    End If
-                Catch ex As Exception
-                End Try
-            Catch ex As Exception
-            End Try
+			files = IO.Directory.GetFiles(filePath + "\", "vulkaninfo*.*")
+			For i As Integer = 0 To files.Length - 1
+				If Not checkvariables.isnullorwhitespace(files(i)) Then
+					Try
+						deletefile(files(i))
+					Catch ex As Exception
+					End Try
+				End If
+			Next
+		End If
 
-            filePath = filepaths + "\AppData\Local\Temp\Low\NVIDIA Corporation"
+		If IntPtr.Size = 8 Then
+			If removevulkan Then
+				filePath = Environment.GetEnvironmentVariable("windir") + "\SysWOW64"
+				files = IO.Directory.GetFiles(filePath + "\", "vulkan-1*.dll")
+				For i As Integer = 0 To files.Length - 1
+					If Not checkvariables.isnullorwhitespace(files(i)) Then
+						Try
+							deletefile(files(i))
+						Catch ex As Exception
+						End Try
+					End If
+				Next
 
-            Try
-                For Each child As String In My.Computer.FileSystem.GetDirectories(filePath)
-                    If checkvariables.isnullorwhitespace(child) = False Then
-                        If child.ToLower.Contains("nv_cache") Then
-                            Try
-                                deletedirectory(child)
-                            Catch ex As Exception
-                                log(ex.Message)
-                                TestDelete(child)
-                            End Try
-                        End If
-                    End If
-                Next
-                Try
-                    If Directory.GetDirectories(filePath).Length = 0 Then
-                        Try
-                            deletedirectory(filePath)
-                        Catch ex As Exception
-                            log(ex.Message)
-                            TestDelete(filePath)
-                        End Try
-                    Else
-                        For Each data As String In Directory.GetDirectories(filePath)
-                            log("Remaining folders found " + " : " + data)
-                        Next
+				files = IO.Directory.GetFiles(filePath + "\", "vulkaninfo*.*")
+				For i As Integer = 0 To files.Length - 1
+					If Not checkvariables.isnullorwhitespace(files(i)) Then
+						Try
+							deletefile(files(i))
+						Catch ex As Exception
+						End Try
+					End If
+				Next
+			End If
+		End If
 
-                    End If
-                Catch ex As Exception
-                End Try
-            Catch ex As Exception
-            End Try
+		filePath = Environment.GetEnvironmentVariable("windir")
+		Try
+			deletedirectory(filePath + "\Help\nvcpl")
+		Catch ex As Exception
+		End Try
 
-            'windows 8+ only (store apps nv_cache cleanup)
-            Try
-                If win8higher Then
-                    Dim prefilePath As String = filepaths + "\AppData\Local\Packages"
-                    For Each childs As String In My.Computer.FileSystem.GetDirectories(prefilePath)
-                        If Not checkvariables.isnullorwhitespace(childs) Then
-                            filePath = childs + "\AC\Temp\NVIDIA Corporation"
+		Try
+			filePath = Environment.GetEnvironmentVariable("windir") + "\Temp\NVIDIA Corporation"
+			For Each child As String In Directory.GetDirectories(filePath)
+				If checkvariables.isnullorwhitespace(child) = False Then
+					If child.ToLower.Contains("nv_cache") Then
+						Try
+							deletedirectory(child)
+						Catch ex As Exception
+							log(ex.Message)
+							TestDelete(child)
+						End Try
+					End If
+				End If
+			Next
+			Try
+				If Directory.GetDirectories(filePath).Length = 0 Then
+					Try
+						deletedirectory(filePath)
+					Catch ex As Exception
+						log(ex.Message)
+						TestDelete(filePath)
+					End Try
+				Else
+					For Each data As String In Directory.GetDirectories(filePath)
+						log("Remaining folders found " + " : " + data)
+					Next
 
-                            If Directory.Exists(filePath) Then
-                                For Each child As String In My.Computer.FileSystem.GetDirectories(filePath)
-                                    If checkvariables.isnullorwhitespace(child) = False Then
-                                        If child.ToLower.Contains("nv_cache") Then
-                                            Try
-                                                deletedirectory(child)
-                                            Catch ex As Exception
-                                                log(ex.Message)
-                                                TestDelete(child)
-                                            End Try
-                                        End If
-                                    End If
-                                Next
+				End If
+			Catch ex As Exception
+			End Try
+		Catch ex As Exception
+		End Try
 
-                                If Directory.GetDirectories(filePath).Length = 0 Then
-                                    Try
-                                        deletedirectory(filePath)
-                                    Catch ex As Exception
-                                        log(ex.Message)
-                                        TestDelete(filePath)
-                                    End Try
-                                Else
-                                    For Each data As String In Directory.GetDirectories(filePath)
-                                        log("Remaining folders found " + " : " + data)
-                                    Next
 
-                                End If
-                            End If
-                        End If
-                    Next
-                End If
-            Catch ex As Exception
-            End Try
 
-        Next
+		For Each filepaths As String In Directory.GetDirectories(IO.Path.GetDirectoryName(userpth))
 
-        'Cleaning the GFE 2.0.1 and earlier assemblies.
-        If removegfe Then
-            filePath = Environment.GetEnvironmentVariable("windir") + "\assembly\NativeImages_v4.0.30319_32"
-            If Directory.Exists(filePath) Then
-                For Each child As String In Directory.GetDirectories(filePath)
-                    If checkvariables.isnullorwhitespace(child) = False Then
-                        If child.ToLower.Contains("gfexperience") Or
-                            child.ToLower.Contains("nvidia.sett") Or
-                            child.ToLower.Contains("nvidia.updateservice") Or
-                            child.ToLower.Contains("nvidia.win32api") Or
-                            child.ToLower.Contains("installeruiextension") Or
-                            child.ToLower.Contains("installerservice") Or
-                            child.ToLower.Contains("gridservice") Or
-                            child.ToLower.Contains("shadowplay") Or
-                           child.ToLower.Contains("nvidia.gfe") Then
-                            Try
-                                deletedirectory(child)
-                            Catch ex As Exception
-                                log(ex.Message)
-                                TestDelete(child)
-                            End Try
-                        End If
-                    End If
-                Next
-            End If
-        End If
+			filePath = filepaths + "\AppData\Local\Temp\NVIDIA Corporation"
 
-        '-----------------
-        'MUI cache cleanUP
-        '-----------------
-        'Note: this MUST be done after cleaning the folders.
-        log("MuiCache CleanUP")
-        Try
-            For Each regusers As String In My.Computer.Registry.Users.GetSubKeyNames
-                If Not checkvariables.isnullorwhitespace(regusers) Then
-                    regkey = My.Computer.Registry.Users.OpenSubKey(regusers & "\software\classes\local settings\muicache", False)
-                    If regkey IsNot Nothing Then
-                        For Each child As String In regkey.GetSubKeyNames()
-                            If checkvariables.isnullorwhitespace(child) = False Then
-                                subregkey = regkey.OpenSubKey(child, False)
-                                If subregkey IsNot Nothing Then
-                                    For Each childs As String In subregkey.GetSubKeyNames()
-                                        If checkvariables.isnullorwhitespace(childs) = False Then
-                                            For Each Keyname As String In subregkey.OpenSubKey(childs).GetValueNames
-                                                If Not checkvariables.isnullorwhitespace(Keyname) Then
+			Try
+				For Each child As String In My.Computer.FileSystem.GetDirectories(filePath)
+					If checkvariables.isnullorwhitespace(child) = False Then
+						If child.ToLower.Contains("nv_cache") Or
+							child.ToLower.Contains("displaydriver") Then
+							Try
+								deletedirectory(child)
+							Catch ex As Exception
+								log(ex.Message)
+								TestDelete(child)
+							End Try
+						End If
+					End If
+				Next
+				Try
+					If Directory.GetDirectories(filePath).Length = 0 Then
+						Try
+							deletedirectory(filePath)
+						Catch ex As Exception
+							log(ex.Message)
+							TestDelete(filePath)
+						End Try
+					Else
+						For Each data As String In Directory.GetDirectories(filePath)
+							log("Remaining folders found " + " : " + data)
+						Next
 
-                                                    If Keyname.ToLower.Contains("nvstlink.exe") Or
-                                                        Keyname.ToLower.Contains("nvstview.exe") Or
-                                                       Keyname.ToLower.Contains("gfexperience.exe") AndAlso removegfe Or
-                                                       Keyname.ToLower.Contains("nvcpluir.dll") Then
-                                                        Try
-                                                            deletevalue(subregkey.OpenSubKey(childs, True), Keyname)
-                                                        Catch ex As Exception
-                                                            log(ex.Message + ex.StackTrace)
-                                                        End Try
-                                                    End If
-                                                End If
-                                            Next
-                                        End If
-                                    Next
-                                End If
-                            End If
-                        Next
-                    End If
-                End If
-            Next
-        Catch ex As Exception
-            log(ex.Message + ex.StackTrace)
-        End Try
+					End If
+				Catch ex As Exception
+				End Try
+			Catch ex As Exception
+			End Try
 
-        Try
-            For Each regusers As String In My.Computer.Registry.Users.GetSubKeyNames
-                If Not checkvariables.isnullorwhitespace(regusers) Then
-                    regkey = My.Computer.Registry.Users.OpenSubKey(regusers & "\software\classes\local settings\software\microsoft\windows\shell\muicache", True)
-                    If regkey IsNot Nothing Then
+			filePath = filepaths + "\AppData\Local\Temp\NVIDIA"
 
-                        For Each Keyname As String In regkey.GetValueNames
-                            If Not checkvariables.isnullorwhitespace(Keyname) Then
+			Try
+				For Each child As String In My.Computer.FileSystem.GetDirectories(filePath)
+					If checkvariables.isnullorwhitespace(child) = False Then
+						If child.ToLower.Contains("geforceexperienceselfupdate") AndAlso removegfe Or _
+						   child.ToLower.Contains("displaydriver") Then
+							Try
+								deletedirectory(child)
+							Catch ex As Exception
+								log(ex.Message)
+								TestDelete(child)
+							End Try
+						End If
+					End If
+				Next
+				Try
+					If Directory.GetDirectories(filePath).Length = 0 Then
+						Try
+							deletedirectory(filePath)
+						Catch ex As Exception
+							log(ex.Message)
+							TestDelete(filePath)
+						End Try
+					Else
+						For Each data As String In Directory.GetDirectories(filePath)
+							log("Remaining folders found " + " : " + data)
+						Next
 
-                                If Keyname.ToLower.Contains("nvstlink.exe") Or
-                                    Keyname.ToLower.Contains("nvstview.exe") Or
-                                   Keyname.ToLower.Contains("gfexperience.exe") AndAlso removegfe Or
-                                   Keyname.ToLower.Contains("nvcpluir.dll") Then
-                                    Try
-                                        deletevalue(regkey, Keyname)
-                                    Catch ex As Exception
-                                        log(ex.Message + ex.StackTrace)
-                                    End Try
-                                End If
-                            End If
-                        Next
-                    End If
-                End If
-            Next
-        Catch ex As Exception
-            log(ex.Message + ex.StackTrace)
-        End Try
+					End If
+				Catch ex As Exception
+				End Try
+			Catch ex As Exception
+			End Try
 
-        If removephysx Then
-            filePath = Environment.GetFolderPath _
-                (Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\NVIDIA Corporation\physx"
-            CleanupEngine.shareddlls(filePath)
-            filePath = Environment.GetFolderPath _
-                (Environment.SpecialFolder.ProgramFiles) + "\NVIDIA Corporation\physx"
-        End If
+			filePath = filepaths + "\AppData\Local\Temp\Low\NVIDIA Corporation"
 
-    End Sub
+			Try
+				For Each child As String In My.Computer.FileSystem.GetDirectories(filePath)
+					If checkvariables.isnullorwhitespace(child) = False Then
+						If child.ToLower.Contains("nv_cache") Then
+							Try
+								deletedirectory(child)
+							Catch ex As Exception
+								log(ex.Message)
+								TestDelete(child)
+							End Try
+						End If
+					End If
+				Next
+				Try
+					If Directory.GetDirectories(filePath).Length = 0 Then
+						Try
+							deletedirectory(filePath)
+						Catch ex As Exception
+							log(ex.Message)
+							TestDelete(filePath)
+						End Try
+					Else
+						For Each data As String In Directory.GetDirectories(filePath)
+							log("Remaining folders found " + " : " + data)
+						Next
+
+					End If
+				Catch ex As Exception
+				End Try
+			Catch ex As Exception
+			End Try
+
+			'windows 8+ only (store apps nv_cache cleanup)
+			Try
+				If win8higher Then
+					Dim prefilePath As String = filepaths + "\AppData\Local\Packages"
+					For Each childs As String In My.Computer.FileSystem.GetDirectories(prefilePath)
+						If Not checkvariables.isnullorwhitespace(childs) Then
+							filePath = childs + "\AC\Temp\NVIDIA Corporation"
+
+							If Directory.Exists(filePath) Then
+								For Each child As String In My.Computer.FileSystem.GetDirectories(filePath)
+									If checkvariables.isnullorwhitespace(child) = False Then
+										If child.ToLower.Contains("nv_cache") Then
+											Try
+												deletedirectory(child)
+											Catch ex As Exception
+												log(ex.Message)
+												TestDelete(child)
+											End Try
+										End If
+									End If
+								Next
+
+								If Directory.GetDirectories(filePath).Length = 0 Then
+									Try
+										deletedirectory(filePath)
+									Catch ex As Exception
+										log(ex.Message)
+										TestDelete(filePath)
+									End Try
+								Else
+									For Each data As String In Directory.GetDirectories(filePath)
+										log("Remaining folders found " + " : " + data)
+									Next
+
+								End If
+							End If
+						End If
+					Next
+				End If
+			Catch ex As Exception
+			End Try
+
+		Next
+
+		'Cleaning the GFE 2.0.1 and earlier assemblies.
+		If removegfe Then
+			filePath = Environment.GetEnvironmentVariable("windir") + "\assembly\NativeImages_v4.0.30319_32"
+			If Directory.Exists(filePath) Then
+				For Each child As String In Directory.GetDirectories(filePath)
+					If checkvariables.isnullorwhitespace(child) = False Then
+						If child.ToLower.Contains("gfexperience") Or
+							child.ToLower.Contains("nvidia.sett") Or
+							child.ToLower.Contains("nvidia.updateservice") Or
+							child.ToLower.Contains("nvidia.win32api") Or
+							child.ToLower.Contains("installeruiextension") Or
+							child.ToLower.Contains("installerservice") Or
+							child.ToLower.Contains("gridservice") Or
+							child.ToLower.Contains("shadowplay") Or
+						   child.ToLower.Contains("nvidia.gfe") Then
+							Try
+								deletedirectory(child)
+							Catch ex As Exception
+								log(ex.Message)
+								TestDelete(child)
+							End Try
+						End If
+					End If
+				Next
+			End If
+		End If
+
+		'-----------------
+		'MUI cache cleanUP
+		'-----------------
+		'Note: this MUST be done after cleaning the folders.
+		log("MuiCache CleanUP")
+		Try
+			For Each regusers As String In My.Computer.Registry.Users.GetSubKeyNames
+				If Not checkvariables.isnullorwhitespace(regusers) Then
+					regkey = My.Computer.Registry.Users.OpenSubKey(regusers & "\software\classes\local settings\muicache", False)
+					If regkey IsNot Nothing Then
+						For Each child As String In regkey.GetSubKeyNames()
+							If checkvariables.isnullorwhitespace(child) = False Then
+								subregkey = regkey.OpenSubKey(child, False)
+								If subregkey IsNot Nothing Then
+									For Each childs As String In subregkey.GetSubKeyNames()
+										If checkvariables.isnullorwhitespace(childs) = False Then
+											For Each Keyname As String In subregkey.OpenSubKey(childs).GetValueNames
+												If Not checkvariables.isnullorwhitespace(Keyname) Then
+
+													If Keyname.ToLower.Contains("nvstlink.exe") Or
+														Keyname.ToLower.Contains("nvstview.exe") Or
+													   Keyname.ToLower.Contains("gfexperience.exe") AndAlso removegfe Or
+													   Keyname.ToLower.Contains("nvcpluir.dll") Then
+														Try
+															deletevalue(subregkey.OpenSubKey(childs, True), Keyname)
+														Catch ex As Exception
+															log(ex.Message + ex.StackTrace)
+														End Try
+													End If
+												End If
+											Next
+										End If
+									Next
+								End If
+							End If
+						Next
+					End If
+				End If
+			Next
+		Catch ex As Exception
+			log(ex.Message + ex.StackTrace)
+		End Try
+
+		Try
+			For Each regusers As String In My.Computer.Registry.Users.GetSubKeyNames
+				If Not checkvariables.isnullorwhitespace(regusers) Then
+					regkey = My.Computer.Registry.Users.OpenSubKey(regusers & "\software\classes\local settings\software\microsoft\windows\shell\muicache", True)
+					If regkey IsNot Nothing Then
+
+						For Each Keyname As String In regkey.GetValueNames
+							If Not checkvariables.isnullorwhitespace(Keyname) Then
+
+								If Keyname.ToLower.Contains("nvstlink.exe") Or
+									Keyname.ToLower.Contains("nvstview.exe") Or
+								   Keyname.ToLower.Contains("gfexperience.exe") AndAlso removegfe Or
+								   Keyname.ToLower.Contains("nvcpluir.dll") Then
+									Try
+										deletevalue(regkey, Keyname)
+									Catch ex As Exception
+										log(ex.Message + ex.StackTrace)
+									End Try
+								End If
+							End If
+						Next
+					End If
+				End If
+			Next
+		Catch ex As Exception
+			log(ex.Message + ex.StackTrace)
+		End Try
+
+		If removephysx Then
+			filePath = Environment.GetFolderPath _
+				(Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\NVIDIA Corporation\physx"
+			CleanupEngine.shareddlls(filePath)
+			filePath = Environment.GetFolderPath _
+				(Environment.SpecialFolder.ProgramFiles) + "\NVIDIA Corporation\physx"
+		End If
+
+	End Sub
 
     Private Sub cleannvidia()
         Dim regkey As RegistryKey = Nothing
@@ -3731,39 +3856,61 @@ Public Class frmMain
                             End Try
                         End If
                     End If
-                Next
-                If regkey.GetValueNames().Length = 0 Then
-                    Try
-                        deletesubregkey(My.Computer.Registry.LocalMachine, "Software\Khronos")
-                    Catch ex As Exception
-                    End Try
-                End If
+				Next
+				If regkey.GetValueNames().Length = 0 Then
+					Try
+						deletesubregkey(My.Computer.Registry.LocalMachine, "Software\Khronos\OpenCL")
+					Catch ex As Exception
+					End Try
+				End If
+				CleanVulkan()
+				regkey = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Khronos", True)
+				If regkey IsNot Nothing Then
+					If regkey.GetSubKeyNames().Length = 0 Then
+						Try
+							deletesubregkey(My.Computer.Registry.LocalMachine, "Software\Khronos")
+						Catch ex As Exception
+						End Try
+					End If
+				End If
             End If
         Catch ex As Exception
         End Try
 
         If IntPtr.Size = 8 Then
-            regkey = My.Computer.Registry.LocalMachine.OpenSubKey("Software\Wow6432Node\Khronos\OpenCL\Vendors", True)
-            If regkey IsNot Nothing Then
-                For Each child As String In regkey.GetValueNames()
-                    If checkvariables.isnullorwhitespace(child) = False Then
-                        If child.ToLower.Contains("nvopencl") Then
-                            Try
-                                deletevalue(regkey, child)
-                            Catch ex As Exception
-                            End Try
-                        End If
-                    End If
-                Next
-                If regkey.GetValueNames().Length = 0 Then
-                    Try
-                        deletesubregkey(My.Computer.Registry.LocalMachine, "Software\Wow6432Node\Khronos")
-                    Catch ex As Exception
-                    End Try
-                End If
-            End If
+			Try
+				regkey = My.Computer.Registry.LocalMachine.OpenSubKey("Software\Wow6432Node\Khronos\OpenCL\Vendors", True)
+				If regkey IsNot Nothing Then
+					For Each child As String In regkey.GetValueNames()
+						If checkvariables.isnullorwhitespace(child) = False Then
+							If child.ToLower.Contains("nvopencl") Then
+								Try
+									deletevalue(regkey, child)
+								Catch ex As Exception
+								End Try
+							End If
+						End If
+					Next
+					If regkey.GetValueNames().Length = 0 Then
+						Try
+							deletesubregkey(My.Computer.Registry.LocalMachine, "Software\WOW6432Node\Khronos\OpenCL")
+						Catch ex As Exception
+						End Try
+					End If
+					regkey = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\WOW6432Node\Khronos", True)
+					If regkey IsNot Nothing Then
+						If regkey.GetSubKeyNames().Length = 0 Then
+							Try
+								deletesubregkey(My.Computer.Registry.LocalMachine, "Software\WOW6432Node\Khronos")
+							Catch ex As Exception
+							End Try
+						End If
+					End If
+				End If
+			Catch ex As Exception
+			End Try
 
-        End If
+		End If
 
 
         Try
@@ -3833,13 +3980,14 @@ Public Class frmMain
                                 Dim tArray() As String = CType(regkey.GetValue(child), String())
                                 For i As Integer = 0 To tArray.Length - 1
                                     If checkvariables.isnullorwhitespace(tArray(i)) = False AndAlso Not tArray(i) = "" Then
-                                        If tArray(i).ToLower.ToString.Contains("nvstview.exe") Or _
-                                           tArray(i).ToLower.ToString.Contains("nvstlink.exe") Then
-                                            Try
-                                                deletevalue(regkey, child)
-                                            Catch ex As Exception
-                                            End Try
-                                        End If
+										If tArray(i).ToLower.ToString.Contains("nvstview.exe") Or _
+										   tArray(i).ToLower.ToString.Contains("vulkaninfo") Or _
+										   tArray(i).ToLower.ToString.Contains("nvstlink.exe") Then
+											Try
+												deletevalue(regkey, child)
+											Catch ex As Exception
+											End Try
+										End If
                                     End If
                                 Next
                             End If
@@ -3858,13 +4006,14 @@ Public Class frmMain
                     Dim tArray() As String = CType(regkey.GetValue(child), String())
                     For i As Integer = 0 To tArray.Length - 1
                         If checkvariables.isnullorwhitespace(tArray(i)) = False AndAlso Not tArray(i) = "" Then
-                            If tArray(i).ToLower.ToString.Contains("nvi2.dll") Or _
-                               tArray(i).ToLower.ToString.Contains("nvstlink.exe") Then
-                                Try
-                                    deletevalue(regkey, child)
-                                Catch ex As Exception
-                                End Try
-                            End If
+							If tArray(i).ToLower.ToString.Contains("nvi2.dll") Or _
+							   tArray(i).ToLower.ToString.Contains("vulkaninfo") Or _
+							   tArray(i).ToLower.ToString.Contains("nvstlink.exe") Then
+								Try
+									deletevalue(regkey, child)
+								Catch ex As Exception
+								End Try
+							End If
                         End If
                     Next
                 End If
@@ -4082,38 +4231,39 @@ Public Class frmMain
                             Catch ex As Exception
                                 log(ex.Message + ex.StackTrace + "WoWChild = " + child)
                             End Try
-                            If child.ToLower.Contains("display.3dvision") Or
-                                child.ToLower.Contains("3dtv") Or
-                                child.ToLower.Contains("_display.controlpanel") Or
-                                child.ToLower.Contains("_display.driver") Or
-                                child.ToLower.Contains("_display.gfexperience") AndAlso removegfe Or
-                                child.ToLower.Contains("_display.nvirusb") Or
-                                child.ToLower.Contains("_display.physx") Or
-                                child.ToLower.Contains("_display.update") AndAlso removegfe Or
-                                child.ToLower.Contains("_display.gamemonitor") AndAlso removegfe Or
-                                child.ToLower.Contains("_gfexperience") AndAlso removegfe Or
-                                child.ToLower.Contains("_hdaudio.driver") Or
-                                child.ToLower.Contains("_installer") AndAlso removegfe Or
-                                child.ToLower.Contains("_network.service") AndAlso removegfe Or
-                                child.ToLower.Contains("_shadowplay") AndAlso removegfe Or
-                                child.ToLower.Contains("_update.core") AndAlso removegfe Or
-                                child.ToLower.Contains("nvidiastereo") Or
-                                child.ToLower.Contains("_shieldwireless") AndAlso removegfe Or
-                                child.ToLower.Contains("miracast.virtualaudio") AndAlso removegfe Or
-                                child.ToLower.Contains("_virtualaudio.driver") AndAlso removegfe Then
-                                If removephysx = False And child.ToLower.Contains("physx") Then
-                                    Continue For
-                                End If
-                                If remove3dtvplay = False And child.ToLower.Contains("3dtv") Then
-                                    Continue For
-                                End If
-                                Try
-                                    deletesubregkey(regkey, child)
-                                Catch ex As Exception
-                                End Try
-                            End If
-                        End If
-                    Next
+							If child.ToLower.Contains("display.3dvision") Or
+								child.ToLower.Contains("3dtv") Or
+								child.ToLower.Contains("_display.controlpanel") Or
+								child.ToLower.Contains("_display.driver") Or
+								child.ToLower.Contains("_display.gfexperience") AndAlso removegfe Or
+								child.ToLower.Contains("_display.nvirusb") Or
+								child.ToLower.Contains("_display.physx") Or
+								child.ToLower.Contains("_display.update") AndAlso removegfe Or
+								child.ToLower.Contains("_display.gamemonitor") AndAlso removegfe Or
+								child.ToLower.Contains("_gfexperience") AndAlso removegfe Or
+								child.ToLower.Contains("_hdaudio.driver") Or
+								child.ToLower.Contains("_installer") AndAlso removegfe Or
+								child.ToLower.Contains("_network.service") AndAlso removegfe Or
+								child.ToLower.Contains("_shadowplay") AndAlso removegfe Or
+								child.ToLower.Contains("_update.core") AndAlso removegfe Or
+								child.ToLower.Contains("nvidiastereo") Or
+								child.ToLower.Contains("_shieldwireless") AndAlso removegfe Or
+								child.ToLower.Contains("miracast.virtualaudio") AndAlso removegfe Or
+								child.ToLower.Contains("_virtualaudio.driver") AndAlso removegfe Or
+								child.ToLower.Contains("vulkanrt1.") AndAlso removevulkan Then
+								If removephysx = False And child.ToLower.Contains("physx") Then
+									Continue For
+								End If
+								If remove3dtvplay = False And child.ToLower.Contains("3dtv") Then
+									Continue For
+								End If
+								Try
+									deletesubregkey(regkey, child)
+								Catch ex As Exception
+								End Try
+							End If
+						End If
+					Next
                 End If
             Catch ex As Exception
                 log(ex.Message + ex.StackTrace)
@@ -4140,44 +4290,45 @@ Public Class frmMain
                         Catch ex As Exception
                             log(ex.Message + ex.StackTrace + "Child = " + child)
                         End Try
-                        If child.ToLower.Contains("display.3dvision") Or
-                            child.ToLower.Contains("3dtv") Or
-                            child.ToLower.Contains("_display.controlpanel") Or
-                            child.ToLower.Contains("_display.driver") Or
-                            child.ToLower.Contains("_display.optimus") Or
-                            child.ToLower.Contains("_display.gfexperience") AndAlso removegfe Or
-                            child.ToLower.Contains("_display.nvirusb") Or
-                            child.ToLower.Contains("_display.physx") Or
-                            child.ToLower.Contains("_display.update") AndAlso removegfe Or
-                            child.ToLower.Contains("_osc") AndAlso removegfe Or
-                            child.ToLower.Contains("_display.nview") Or
-                            child.ToLower.Contains("_display.nvwmi") Or
-                            child.ToLower.Contains("_display.gamemonitor") AndAlso removegfe Or
-                            child.ToLower.Contains("_nvidia.update") AndAlso removegfe Or
-                            child.ToLower.Contains("_gfexperience") AndAlso removegfe Or
-                            child.ToLower.Contains("_hdaudio.driver") Or
-                            child.ToLower.Contains("_installer") AndAlso removegfe Or
-                            child.ToLower.Contains("_network.service") AndAlso removegfe Or
-                            child.ToLower.Contains("_shadowplay") AndAlso removegfe Or
-                            child.ToLower.Contains("_update.core") AndAlso removegfe Or
-                            child.ToLower.Contains("nvidiastereo") Or
-                            child.ToLower.Contains("_shieldwireless") AndAlso removegfe Or
-                            child.ToLower.Contains("miracast.virtualaudio") AndAlso removegfe Or
-                            child.ToLower.Contains("_virtualaudio.driver") Then
-                            If removephysx = False And child.ToLower.Contains("physx") Then
-                                Continue For
-                            End If
+						If child.ToLower.Contains("display.3dvision") Or
+							child.ToLower.Contains("3dtv") Or
+							child.ToLower.Contains("_display.controlpanel") Or
+							child.ToLower.Contains("_display.driver") Or
+							child.ToLower.Contains("_display.optimus") Or
+							child.ToLower.Contains("_display.gfexperience") AndAlso removegfe Or
+							child.ToLower.Contains("_display.nvirusb") Or
+							child.ToLower.Contains("_display.physx") Or
+							child.ToLower.Contains("_display.update") AndAlso removegfe Or
+							child.ToLower.Contains("_osc") AndAlso removegfe Or
+							child.ToLower.Contains("_display.nview") Or
+							child.ToLower.Contains("_display.nvwmi") Or
+							child.ToLower.Contains("_display.gamemonitor") AndAlso removegfe Or
+							child.ToLower.Contains("_nvidia.update") AndAlso removegfe Or
+							child.ToLower.Contains("_gfexperience") AndAlso removegfe Or
+							child.ToLower.Contains("_hdaudio.driver") Or
+							child.ToLower.Contains("_installer") AndAlso removegfe Or
+							child.ToLower.Contains("_network.service") AndAlso removegfe Or
+							child.ToLower.Contains("_shadowplay") AndAlso removegfe Or
+							child.ToLower.Contains("_update.core") AndAlso removegfe Or
+							child.ToLower.Contains("nvidiastereo") Or
+							child.ToLower.Contains("_shieldwireless") AndAlso removegfe Or
+							child.ToLower.Contains("miracast.virtualaudio") AndAlso removegfe Or
+							child.ToLower.Contains("_virtualaudio.driver") AndAlso removegfe Or
+							child.ToLower.Contains("vulkanrt1.") AndAlso removevulkan Then
+							If removephysx = False And child.ToLower.Contains("physx") Then
+								Continue For
+							End If
 
-                            If remove3dtvplay = False And child.ToLower.Contains("3dtv") Then
-                                Continue For
-                            End If
-                            Try
-                                deletesubregkey(regkey, child)
-                            Catch ex As Exception
-                            End Try
-                        End If
-                    End If
-                Next
+							If remove3dtvplay = False And child.ToLower.Contains("3dtv") Then
+								Continue For
+							End If
+							Try
+								deletesubregkey(regkey, child)
+							Catch ex As Exception
+							End Try
+						End If
+					End If
+				Next
             End If
         Catch ex As Exception
             log(ex.Message + ex.StackTrace)
@@ -4942,7 +5093,9 @@ Public Class frmMain
                                             If Not checkvariables.isnullorwhitespace(packages(i)) Then
                                                 If wantedvalue.ToLower.Contains(packages(i).ToLower) Then
                                                     Try
-                                                        deletesubregkey(regkey, child)
+														If Not (removevulkan = False AndAlso wantedvalue.ToLower.Contains("vulkan")) Then
+															deletesubregkey(regkey, child)
+														End If
                                                     Catch ex As Exception
                                                     End Try
                                                 End If
@@ -5921,6 +6074,14 @@ Public Class frmMain
 			Else
 				f.CheckBox14.Checked = False
 				removedxcache = False
+			End If
+
+			If settings.getconfig("removevulkan") = "true" Then
+				f.cbxVulkan.Checked = True
+				removevulkan = True
+			Else
+				f.cbxVulkan.Checked = False
+				removevulkan = False
 			End If
 
 			If closeapp Then
@@ -8078,7 +8239,7 @@ Public Class genericfunction
                     End If
                 End If
             Next
-            'if we endup here, it mean the value is not found on .cfg so we add it.
+			'if we endup here, it mean the value is not found on .cfg so we add it with a False value.
             Array.Resize(lines, lines.Length + 1)
             lines(lines.Length - 1) = options + "=false"
             If isUsingRoaming = False Then
