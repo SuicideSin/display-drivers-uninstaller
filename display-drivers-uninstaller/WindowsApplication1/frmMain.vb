@@ -1595,16 +1595,16 @@ Public Class frmMain
                                 If regkey IsNot Nothing Then
                                     For Each child As String In regkey.GetSubKeyNames()
                                         If checkvariables.isnullorwhitespace(child) = False Then
-                                            If child.ToLower.Contains("legacy_amdkmdag") Or _
-                                                (child.ToLower.Contains("legacy_amdkmdag") AndAlso removeamdkmpfd) Or _
-                                                child.ToLower.Contains("legacy_amdacpksd") Then
+											If child.ToLower.Contains("legacy_amdkmdag") Or _
+												(child.ToLower.Contains("legacy_amdkmpfd") AndAlso removeamdkmpfd) Or _
+												child.ToLower.Contains("legacy_amdacpksd") Then
 
-                                                Try
-                                                    deletesubregkey(My.Computer.Registry.LocalMachine, "SYSTEM\" & childs & "\Enum\Root\" & child)
-                                                Catch ex As Exception
-                                                    log(ex.Message & " Legacy_AMDKMDAG   (error)")
-                                                End Try
-                                            End If
+												Try
+													deletesubregkey(My.Computer.Registry.LocalMachine, "SYSTEM\" & childs & "\Enum\Root\" & child)
+												Catch ex As Exception
+													log(ex.Message & " Legacy_AMDKMDAG   (error)")
+												End Try
+											End If
                                         End If
                                     Next
                                 End If
@@ -2557,7 +2557,7 @@ Public Class frmMain
 	End Sub
 	Private Sub CleanVulkan()
 		Dim regkey As RegistryKey = Nothing
-
+		Dim filepath As String = Nothing
 		If removevulkan Then
 			regkey = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Khronos", True)
 			If regkey IsNot Nothing Then
@@ -2569,6 +2569,19 @@ Public Class frmMain
 					End If
 				Next
 			End If
+
+			filePath = Environment.GetFolderPath _
+		(Environment.SpecialFolder.ProgramFiles) + "\VulkanRT"
+			If Directory.Exists(filePath) Then
+				Try
+					deletedirectory(filePath)
+				Catch ex As Exception
+				End Try
+			End If
+			If Not Directory.Exists(filePath) Then
+				CleanupEngine.shareddlls(filePath)
+			End If
+
 			If IntPtr.Size = 8 Then
 				regkey = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\WOW6432Node\Khronos", True)
 				If regkey IsNot Nothing Then
@@ -2579,6 +2592,17 @@ Public Class frmMain
 							End If
 						End If
 					Next
+				End If
+				filepath = Environment.GetFolderPath _
+					(Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\VulkanRT"
+				If Directory.Exists(filepath) Then
+					Try
+						deletedirectory(filepath)
+					Catch ex As Exception
+					End Try
+				End If
+				If Not Directory.Exists(filepath) Then
+					CleanupEngine.shareddlls(filepath)
 				End If
 			End If
 		End If
@@ -3013,20 +3037,6 @@ Public Class frmMain
             CleanupEngine.shareddlls(filePath)
         End If
 
-		If removevulkan Then
-			filePath = Environment.GetFolderPath _
-		(Environment.SpecialFolder.ProgramFiles) + "\VulkanRT"
-			If Directory.Exists(filePath) Then
-				Try
-					deletedirectory(filePath)
-				Catch ex As Exception
-				End Try
-			End If
-			If Not Directory.Exists(filePath) Then
-				CleanupEngine.shareddlls(filePath)
-			End If
-		End If
-
 		If IntPtr.Size = 8 Then
 			filePath = Environment.GetFolderPath _
 				(Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\NVIDIA Corporation"
@@ -3106,21 +3116,7 @@ Public Class frmMain
 			End If
 		End If
 
-		If removevulkan Then
-			If IntPtr.Size = 8 Then
-				filePath = Environment.GetFolderPath _
-					(Environment.SpecialFolder.ProgramFiles) + " (x86)" + "\VulkanRT"
-				If Directory.Exists(filePath) Then
-					Try
-						deletedirectory(filePath)
-					Catch ex As Exception
-					End Try
-				End If
-				If Not Directory.Exists(filePath) Then
-					CleanupEngine.shareddlls(filePath)
-				End If
-			End If
-		End If
+
 
 		CleanupEngine.folderscleanup(IO.File.ReadAllLines(Application.StartupPath & "\settings\NVIDIA\driverfiles.cfg")) '// add each line as String Array.
 		If removegfe Then
