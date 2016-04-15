@@ -7915,7 +7915,6 @@ Public Class frmMain
 			Else
 				systemLang = System.Globalization.CultureInfo.CurrentCulture.ThreeLetterWindowsLanguageName	  'en, fr, sv etc.
 			End If
-			MsgBox(systemLang)
 			Dim lastUsedLang As String = settings.getconfig("language")
 
 			Dim hasLastUsed As Boolean = False
