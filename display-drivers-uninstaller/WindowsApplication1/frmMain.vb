@@ -7913,7 +7913,7 @@ Public Class frmMain
 			ElseIf systemLang.ToLower = "chs" Then
 				systemLang = "zh2"
 			Else
-				systemLang = System.Globalization.CultureInfo.CurrentCulture.ThreeLetterWindowsLanguageName	  'en, fr, sv etc.
+				systemLang = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName	  'en, fr, sv etc.
 			End If
 			Dim lastUsedLang As String = settings.getconfig("language")
 
