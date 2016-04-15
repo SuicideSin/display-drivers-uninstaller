@@ -7907,7 +7907,15 @@ Public Class frmMain
 
 			Language.Load()	'default = english
 
-			Dim systemLang As String = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName	'en, fr, sv etc.
+			Dim systemLang As String = System.Globalization.CultureInfo.CurrentCulture.ThreeLetterWindowsLanguageName	'to find if Chinesse Traditional or simplified
+			If systemLang.ToLower = "cht" Then
+				systemLang = "zh"
+			ElseIf systemLang.ToLower = "chs" Then
+				systemLang = "zh2"
+			Else
+				systemLang = System.Globalization.CultureInfo.CurrentCulture.ThreeLetterWindowsLanguageName	  'en, fr, sv etc.
+			End If
+			MsgBox(systemLang)
 			Dim lastUsedLang As String = settings.getconfig("language")
 
 			Dim hasLastUsed As Boolean = False
@@ -7924,6 +7932,7 @@ Public Class frmMain
 
 				If Not hasNativeLang AndAlso systemLang.Equals(item.ISOLanguage, StringComparison.OrdinalIgnoreCase) Then
 					nativeLang = item 'take native on hold incase last used language not found (avoid multiple loops)
+					hasNativeLang = True
 				End If
 			Next
 
